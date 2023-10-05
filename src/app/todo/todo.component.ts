@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TodoService } from './todo.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-todo',
@@ -12,18 +13,22 @@ export class TodoComponent implements OnInit {
   public todos:any;
   public activeTasks:boolean;
   public newTodo:string = '';
+  public path:string;
 
-  constructor(private todoService: TodoService) { }
-
-  getTodos(){
-    return this.todoService.get().then(todos =>{
-      this.todos = todos;
-      this.activeTasks = this.todos.filter(todo => !todo.isDone).length;
-    })
-  }
+  constructor(private todoService: TodoService,  private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.getTodos()
+    this.route.params.subscribe(params =>{
+      this.path = params['status'];
+    })
+    this.getTodos(this.path);
+  }
+
+  getTodos(query = ''){
+    return this.todoService.get(query).then(todos =>{
+      this.todos = todos;
+      this.activeTasks = this.todos.filter(todo=>!todo.isDone).length;
+    })
   }
 
   addTodo(){
@@ -51,5 +56,17 @@ export class TodoComponent implements OnInit {
     this.todoService.delete(todo).then(()=>{
       return this.getTodos();
     })
+  }
+
+  clearCompleted(){
+    this.todoService.deleteCompleted().then(()=>{
+      return this.getTodos();
+    })
+  }
+
+  toggleTodo(todo) {
+    this.todoService.toggle(todo).then(() => {
+      return this.getTodos();
+    });
   }
 }

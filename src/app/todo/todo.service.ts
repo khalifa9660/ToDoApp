@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { promise } from 'protractor';
 
-const TODOS = [
+let TODOS = [
   {title: 'Maîtriser le CRUD', isDone: true},
   {title: 'chercher à comprendre un maximum les choses', isDone: false},
   {title: "Savoir dire que l'on ne sait pas", isDone: true},
@@ -18,8 +18,19 @@ export class TodoService {
 
   constructor() { }
 
-  get(){
-    return new Promise(resolve => resolve(TODOS))
+  get(query = ''){
+    return new Promise(resolve => {
+      let data;
+
+      if(query === 'completed' || query === 'active'){
+        const isCompleted = query === 'completed';
+        data = TODOS.filter(todo => todo.isDone === isCompleted);
+      } else {
+        data = TODOS;
+      }
+
+      resolve(data)
+    })
   }
 
   add(data){
@@ -43,5 +54,17 @@ export class TodoService {
       TODOS.splice(index, 1);
       resolve(true)
     })
+  }
+
+  deleteCompleted(){
+    return new Promise(resolve => {
+      TODOS = TODOS.filter(todo => !todo.isDone);
+      resolve(TODOS);
+    })
+  }
+
+  toggle(selected) {
+    selected.isDone = !selected.isDone;
+    return Promise.resolve();
   }
 }
