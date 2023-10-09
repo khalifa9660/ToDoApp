@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { promise } from 'protractor';
+import { TodoItem } from '../Models/Todo';
 
 let TODOS = [
   {title: 'Maîtriser le CRUD', isDone: true},
@@ -15,8 +15,9 @@ let TODOS = [
   providedIn: 'root'
 })
 export class TodoService {
-
   constructor() { }
+
+  TODO: TodoItem[] = []
 
   get(query = ''){
     return new Promise(resolve => {
@@ -66,5 +67,9 @@ export class TodoService {
   toggle(selected) {
     selected.isDone = !selected.isDone;
     return Promise.resolve();
+  }
+
+  AddTodoItem(title:string, isDone:boolean):void{
+    this.TODO.push(new TodoItem(title, isDone))
   }
 }
